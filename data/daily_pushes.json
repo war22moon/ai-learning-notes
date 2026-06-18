@@ -1,0 +1,383 @@
+{
+  "meta": {
+    "title": "100天AI行业学习推送归档",
+    "timezone": "Asia/Shanghai",
+    "cron_id": "895aac79",
+    "description": "每日 AI 行业学习推送的结构化归档数据，由 scripts/init_daily_push_archive.py 读取并生成 daily-pushes/ 下的独立 Markdown 页面与索引。"
+  },
+  "pushes": [
+    {
+      "slug": "day-01-inference-engine-selection",
+      "day_label": "Day 1",
+      "date": "2026-06-16",
+      "time": "18:03",
+      "title": "推理引擎选型：vLLM vs SGLang vs TensorRT-LLM（推理成本=商业成本）",
+      "tags": ["推理引擎", "vLLM", "SGLang", "TensorRT-LLM", "推理成本", "TCO"],
+      "sources": [
+        {"label": "YOMXXX：推理引擎横评", "url": "https://yomxxx.com/posts/2026-06-04-llm-inference-engine-comparison-2026-tools"},
+        {"label": "NVIDIA AI Inference", "url": "https://www.nvidia.com/en-us/solutions/ai/inference/"}
+      ],
+      "notice": "",
+      "sections": [
+        {
+          "heading": "为什么今天要懂它",
+          "body": "对售前/产品/项目管理来说，LLM“能不能规模化落地”往往不是模型能力，而是推理成本与 SLA。推理引擎选型会直接影响吞吐、延迟、需要多少 GPU，以及最终毛利率。YOMXXX 的对比指出：推理已成为企业 AI 算力支出的大头，且同卡同模不同引擎吞吐可能差约三成，等价于 GPU 数量与月账单差三成（[YOMXXX](https://yomxxx.com/posts/2026-06-04-llm-inference-engine-comparison-2026-tools)）。"
+        },
+        {
+          "heading": "一句话解释",
+          "body": "推理引擎就是“把模型变成可对外提供 API 的生产线”，它决定你每秒能产出多少 token、p95 延迟能否达标，以及每百万 token 的真实成本。"
+        },
+        {
+          "heading": "核心概念（面向业务的四个指标）",
+          "body": "1) **吞吐（tokens/s）**：单位 GPU 能服务多少并发/多少批量任务。\n2) **延迟（尤其 p95）**：能否做实时对话/客服/交互式 Copilot。\n3) **资源效率（显存 / KV cache / 批处理）**：同一张卡能挂多少会话。\n4) **成本口径**：别只看“GPU 每小时单价”，要看“每百万 token 成本”。NVIDIA 强调 **cost per token** 是推理 TCO 的关键指标，并给出 Blackwell 相对 Hopper 的对比表（[NVIDIA AI Inference](https://www.nvidia.com/en-us/solutions/ai/inference/)）。"
+        },
+        {
+          "heading": "产业链/玩家/产品动态（你需要认识的 5 个选项）",
+          "body": "- **vLLM**：生态最大、OpenAI 兼容接口开箱即用，适合作为生产默认起点（[YOMXXX](https://yomxxx.com/posts/2026-06-04-llm-inference-engine-comparison-2026-tools)）。\n- **SGLang**：主打吞吐；YOMXXX 举例 H200 上吞吐可比 vLLM 高约 **33%**（[YOMXXX](https://yomxxx.com/posts/2026-06-04-llm-inference-engine-comparison-2026-tools)）。适合高并发、批处理、离线生成等“吞吐=钱”的场景。\n- **TensorRT-LLM**：NVIDIA 系极致优化，强调高负载下 p95 延迟与性能，但需要编译/调参、锁定 NVIDIA 生态（[YOMXXX](https://yomxxx.com/posts/2026-06-04-llm-inference-engine-comparison-2026-tools)）。\n- **Modular MAX**：面向异构硬件（CUDA/ROCm/Metal）的编译路线，适合想摆脱单一硬件锁定的团队（[YOMXXX](https://yomxxx.com/posts/2026-06-04-llm-inference-engine-comparison-2026-tools)）。\n- **llama.cpp**：本地/边缘/消费级设备与量化生态强，适合端侧与私有化轻量部署（[YOMXXX](https://yomxxx.com/posts/2026-06-04-llm-inference-engine-comparison-2026-tools)）。"
+        },
+        {
+          "heading": "典型服务/商业模式怎么受影响",
+          "body": "- **按量计费 API / 企业 SaaS**：吞吐提升≈单位 GPU 收入上限提升；p95 延迟降低≈更高定价能力。\n- **私有化交付/项目制**：vLLM 更稳交付风险低；TensorRT-LLM/SGLang 更“性能工程”，但可能显著降低硬件预算。\n- **AI 工厂/算力运营**：报价建议从“每卡小时”转为“每百万 token 成本 + SLA”，因为 NVIDIA 也用这一口径解释 Blackwell 的经济性（[NVIDIA AI Inference](https://www.nvidia.com/en-us/solutions/ai/inference/)）。"
+        },
+        {
+          "heading": "对云服务/云游戏/AI 创业的启发",
+          "body": "- 云游戏本质是“延迟+吞吐”生意：若做实时语音/NPC/陪玩/生成式剧情，**p95 延迟**是体验红线；离线内容生成/UGC 工具则吞吐为王。\n- 创业早期建议：先用 **vLLM** 跑通业务与数据闭环，再用真实流量压测决定是否切 **SGLang（吞吐瓶颈）**或评估 **TensorRT-LLM（硬 SLA 延迟瓶颈）**（[YOMXXX](https://yomxxx.com/posts/2026-06-04-llm-inference-engine-comparison-2026-tools)）。\n- 当新硬件持续压低“每百万 token 成本”时，产品侧要同步升级为更长上下文、更强推理、多代理流程，才能把省下的成本转成体验或价格优势（[NVIDIA AI Inference](https://www.nvidia.com/en-us/solutions/ai/inference/)）。"
+        },
+        {
+          "heading": "术语卡片（5 个）",
+          "body": "- **Continuous Batching（连续批处理）**：动态拼批提高 GPU 利用率（vLLM 关键能力之一）（[YOMXXX](https://yomxxx.com/posts/2026-06-04-llm-inference-engine-comparison-2026-tools)）。\n- **KV Cache**：注意力机制“历史记忆”缓存，显存大户，决定并发上限。\n- **p95 延迟**：95% 请求都能满足的延迟上界，决定交互体验与 SLA。\n- **Cost per Token**：每生成单位 token 的综合成本，适合做 TCO 与定价口径（[NVIDIA AI Inference](https://www.nvidia.com/en-us/solutions/ai/inference/)）。\n- **推理 TCO**：推理总拥有成本（GPU、网络、运维、软件栈效率等）（[NVIDIA AI Inference](https://www.nvidia.com/en-us/solutions/ai/inference/)）。"
+        },
+        {
+          "heading": "今日行动建议（15–30 分钟）",
+          "body": "1) 用一句话写清你的业务“瓶颈优先级”：**吞吐优先**还是**延迟优先**？\n2) 画一个简单决策树：先 vLLM 上线→压测→吞吐瓶颈切 SGLang / 延迟硬 SLA 评估 TensorRT-LLM（参考 [YOMXXX](https://yomxxx.com/posts/2026-06-04-llm-inference-engine-comparison-2026-tools)）。\n3) 把你当前/目标的计费口径改成“三指标”：**每百万 token 成本 + p95 延迟 + 并发上限**，不再只盯 GPU 小时单价。"
+        },
+        {
+          "heading": "延伸阅读",
+          "body": "- 推理引擎横评与决策树（[YOMXXX](https://yomxxx.com/posts/2026-06-04-llm-inference-engine-comparison-2026-tools)）\n- NVIDIA 以 cost per token 解释推理经济学与 Blackwell 指标（[NVIDIA AI Inference](https://www.nvidia.com/en-us/solutions/ai/inference/)）"
+        }
+      ]
+    },
+    {
+      "slug": "day-02-mcp-v2-production-infrastructure",
+      "day_label": "Day 2",
+      "date": "2026-06-17",
+      "time": "09:04",
+      "title": "MCP v2（Model Context Protocol）为何从“集成便利”走向“生产基础设施”",
+      "tags": ["MCP", "MCP v2", "Stateless core", "OAuth", "Agent", "工具调用"],
+      "sources": [
+        {"label": "MCP 官方 RC（2026-07-28 规范）", "url": "https://blog.modelcontextprotocol.io/posts/2026-07-28-release-candidate"},
+        {"label": "Context Studios 解读", "url": "https://www.contextstudios.ai/blog/mcp-v2-alpha-the-july-28-protocol-shift-to-plan-for"}
+      ],
+      "notice": "本篇推送在原始推送时引用了未来日期（最终规范日期 2026-07-28、SDK 时间线等）的 MCP v2 材料。归档保留原始事实陈述，不做静默改写。",
+      "sections": [
+        {
+          "heading": "标题",
+          "body": "MCP v2（模型上下文协议）从“集成便利”到“生产基础设施”的升级（最终规范日期：2026-07-28）（[MCP 官方 RC](https://blog.modelcontextprotocol.io/posts/2026-07-28-release-candidate)）"
+        },
+        {
+          "heading": "为什么今天要懂它",
+          "body": "企业把大模型接入真实业务系统（CRM、工单、代码仓库、云资源等）时，难点往往是“能不能在生产环境稳定、安全、可治理地调用工具”，而 MCP v2 的核心变化正是把“Agent 调工具”做成可运维的协议栈（[MCP 官方 RC](https://blog.modelcontextprotocol.io/posts/2026-07-28-release-candidate)）。"
+        },
+        {
+          "heading": "一句话解释",
+          "body": "MCP v2 引入无状态协议核（stateless core）并规范化 Extensions、Tasks、MCP Apps、授权加固与工具 Schema，使其更适配普通 HTTP 基础设施的扩展与治理（[MCP 官方 RC](https://blog.modelcontextprotocol.io/posts/2026-07-28-release-candidate)）。"
+        },
+        {
+          "heading": "核心概念（5 点）",
+          "body": "1) Stateless core：远程 MCP server 不再需要 sticky sessions、共享 session store 或网关深度解析即可路由，请求可落到任意实例，网关可根据 `Mcp-Method` header 路由（[MCP 官方 RC](https://blog.modelcontextprotocol.io/posts/2026-07-28-release-candidate)）。\n2) 移除 handshake 与 session header：`initialize/initialized` 握手移除、`Mcp-Session-Id` header 移除、协议级 session 移除；客户端信息与能力改为每个请求通过 `_meta` 传递，并新增 `server/discover`（[MCP 官方 RC](https://blog.modelcontextprotocol.io/posts/2026-07-28-release-candidate)）。\n3) “协议无状态 ≠ 应用无状态”：需要跨调用状态时，server 应 mint 显式 handle（如 `basket_id`、`browser_id`），模型后续把 handle 当普通参数传回（[MCP 官方 RC](https://blog.modelcontextprotocol.io/posts/2026-07-28-release-candidate)）。\n4) Extensions / MCP Apps / Tasks：扩展用反向 DNS ID 标识、通过 capabilities 的 `extensions` map 协商、独立仓库与独立版本化；MCP Apps 允许 server 提供交互式 HTML UI 并由 host 在 sandboxed iframe 渲染；Tasks 从“核心实验特性”调整为 extension，并重做生命周期（[MCP 官方 RC](https://blog.modelcontextprotocol.io/posts/2026-07-28-release-candidate)）。\n5) 授权与 Schema：授权规范对齐 OAuth2/OIDC 实践（如要求校验 `iss` 等）；tools 的 `inputSchema/outputSchema` 升级到 JSON Schema 2020-12，并要求实现不得自动解引用外部 `$ref`、需限制校验深度与时间（[MCP 官方 RC](https://blog.modelcontextprotocol.io/posts/2026-07-28-release-candidate)）。"
+        },
+        {
+          "heading": "产业链/玩家/产品动态（对售前/产品/项目的意义）",
+          "body": "- MCP v2 把“Agent 调工具”从实验脚本推进到“可被 API Gateway/负载均衡/观测体系承载”的生产形态，便于多实例弹性与高可用（[MCP 官方 RC](https://blog.modelcontextprotocol.io/posts/2026-07-28-release-candidate)）。\n- 迁移窗口与时间线：官方最终规范 2026-07-28；社区解读文给出 Python SDK v2.0.0a1 于 2026-06-11、beta 目标 2026-06-30、stable v2 目标 2026-07-27（[Context Studios 解读](https://www.contextstudios.ai/blog/mcp-v2-alpha-the-july-28-protocol-shift-to-plan-for)）。"
+        },
+        {
+          "heading": "典型服务/商业模式（可用于方案表达）",
+          "body": "- MCP Server 作为“连接器产品”：对接企业应用与数据源，按连接器数/调用量/企业席位收费。\n- MCP Host 作为“企业 Agent 平台”：模型接入、工具编排、权限审计、任务管理、UI 承载，订阅 + 用量计费。\n- 安全与治理增值：围绕 OAuth/OIDC、scope、tenant isolation、审计、可观测性（如 OpenTelemetry）提供企业级加固（[MCP 官方 RC](https://blog.modelcontextprotocol.io/posts/2026-07-28-release-candidate)）。"
+        },
+        {
+          "heading": "对云服务/云游戏/AI 创业的启发",
+          "body": "- 云游戏：把房间/对局/流/风控等能力封装为工具时，优先“显式 handle + 可审计参数”，避免隐式 session，便于多实例与故障恢复（[MCP 官方 RC](https://blog.modelcontextprotocol.io/posts/2026-07-28-release-candidate)）。\n- 售前：当客户问“Agent 如何上生产”，可用无状态路由、授权 hardening、schema 校验策略、扩展协商来回答“可治理、可扩展、可审计”，并强调灰度与回滚（[Context Studios 解读](https://www.contextstudios.ai/blog/mcp-v2-alpha-the-july-28-protocol-shift-to-plan-for)）。\n- 创业机会：垂直行业 MCP Server（游戏运营/广告/客服等）+ 企业治理（权限、审计、观测）会是清晰的产品组合（[MCP 官方 RC](https://blog.modelcontextprotocol.io/posts/2026-07-28-release-candidate)）。"
+        },
+        {
+          "heading": "术语卡片",
+          "body": "- Stateless core：协议层不维护会话状态，请求可落到任意实例（[MCP 官方 RC](https://blog.modelcontextprotocol.io/posts/2026-07-28-release-candidate)）。\n- Explicit handle：server 返回的显式标识，用于跨调用保持业务状态（[MCP 官方 RC](https://blog.modelcontextprotocol.io/posts/2026-07-28-release-candidate)）。\n- `Mcp-Method` / `Mcp-Name`：用于路由与识别请求类型的 headers（[MCP 官方 RC](https://blog.modelcontextprotocol.io/posts/2026-07-28-release-candidate)）。\n- Extensions（反向 DNS ID）：通过 capabilities 协商、独立版本化的协议扩展（[MCP 官方 RC](https://blog.modelcontextprotocol.io/posts/2026-07-28-release-candidate)）。\n- JSON Schema 2020-12：更完整的 schema 能力（oneOf/anyOf/$ref 等），但实现需限制外部引用与校验成本（[MCP 官方 RC](https://blog.modelcontextprotocol.io/posts/2026-07-28-release-candidate)）。"
+        },
+        {
+          "heading": "今日行动建议（15-30 分钟）",
+          "body": "1) 画你当前/目标的“Agent 调工具”架构图：模型（Host）—工具（Server）—业务系统，标出隐式 session 依赖点（[MCP 官方 RC](https://blog.modelcontextprotocol.io/posts/2026-07-28-release-candidate)）。\n2) 选一个云游戏链路能力（如查询房间、拉流、封禁、退款），把工具 API 改成“显式 handle + 可审计参数”，写入参/出参草案（[MCP 官方 RC](https://blog.modelcontextprotocol.io/posts/2026-07-28-release-candidate)）。\n3) 平台选型必问：是否支持无状态部署、OAuth/OIDC、审计/观测、schema 校验与安全策略（[Context Studios 解读](https://www.contextstudios.ai/blog/mcp-v2-alpha-the-july-28-protocol-shift-to-plan-for)）。"
+        },
+        {
+          "heading": "延伸阅读",
+          "body": "- MCP 官方：2026-07-28 规范 Release Candidate（关键改动与最终规范日期）https://blog.modelcontextprotocol.io/posts/2026-07-28-release-candidate （[MCP 官方 RC](https://blog.modelcontextprotocol.io/posts/2026-07-28-release-candidate)）\n- 解读文章：MCP v2 Alpha 迁移窗口与时间线（alpha/beta/stable）https://www.contextstudios.ai/blog/mcp-v2-alpha-the-july-28-protocol-shift-to-plan-for （[Context Studios 解读](https://www.contextstudios.ai/blog/mcp-v2-alpha-the-july-28-protocol-shift-to-plan-for)）"
+        }
+      ]
+    },
+    {
+      "slug": "day-03-envoy-ai-gateway-platform",
+      "day_label": "Day 3",
+      "date": "2026-06-17",
+      "time": "18:08",
+      "title": "AI Gateway（以 Envoy AI Gateway 为例）：把多模型调用、MCP 工具流量、安全与可观测做成平台能力",
+      "tags": ["AI Gateway", "Envoy AI Gateway", "多模型路由", "可观测", "MCP", "多租户"],
+      "sources": [
+        {"label": "Envoy AI Gateway 官网", "url": "https://aigateway.envoyproxy.io/"},
+        {"label": "Envoy AI Gateway Release Notes", "url": "https://aigateway.envoyproxy.io/release-notes/"}
+      ],
+      "notice": "",
+      "sections": [
+        {
+          "heading": "标题",
+          "body": "AI Gateway（以 Envoy AI Gateway 为例）：把多模型调用、MCP 工具流量、安全与可观测做成平台能力"
+        },
+        {
+          "heading": "为什么今天要懂它",
+          "body": "当你把“LLM 调用”从 PoC 变成生产系统，真正难的往往不是模型本身，而是：多模型路由/回退、权限与配额、成本可视化、流式传输稳定性、以及（Agent 场景下）工具调用协议的治理；这些如果散落在各业务里，会迅速变成维护地狱。"
+        },
+        {
+          "heading": "一句话解释",
+          "body": "AI Gateway 就是“面向大模型/Agent 的 API 网关”：把不同模型提供商与协议统一在一个入口，同时提供路由、鉴权、限流、观测、合规等平台能力。"
+        },
+        {
+          "heading": "核心概念（面向售前/产品/项目经理）",
+          "body": "1) 统一接口与协议翻译：业务侧只接一种 API 形态，网关负责把请求翻译到不同提供商。\n2) 路由与多租户：按 hostname/租户/场景把流量打到不同模型集；支持灰度、回退、热切换。\n3) 安全与治理：OAuth/企业级安全、访问控制、工具列表（tools/list）按权限返回，避免“越权工具”。\n4) 可观测与成本：把 token、延迟、错误率、流式中断等变成可追踪指标，支撑 SLA 与成本核算。"
+        },
+        {
+          "heading": "产业链/玩家/产品动态（以 Envoy AI Gateway 为例）",
+          "body": "- Envoy AI Gateway 定位为用 Envoy 生态来处理 GenAI 流量的开源项目，并强调把“企业级安全、路由、可观测”带到 AI Agent 的工具集成与 MCP 协议中（“supports Model Context Protocol (MCP)… enterprise-grade security… routing, and observability… OAuth… zero-friction deployment”见官网描述：https://aigateway.envoyproxy.io/）。\n- v0.7.0 版本新增：AIGatewayRoute 支持基于 hostname 的路由以支持多租户；新增 Anthropic Messages→AWS Bedrock Converse 的协议翻译；支持 Azure OpenAI Responses API；开始引入“配额感知限流”；并增强 reasoning、多模态与 streaming 稳定性（发布说明：https://aigateway.envoyproxy.io/release-notes/）。"
+        },
+        {
+          "heading": "典型服务模式或商业模式（你在售前/产品里会遇到的）",
+          "body": "- “企业 AI 平台队”模式：平台团队提供 Gateway + 统一鉴权/审计/配额/观测，业务团队按“虚拟 Key/预算”自助接入模型。\n- “多云多模型仲裁”模式：同一应用按成本/延迟/地区合规在 OpenAI、Azure、Bedrock、Gemini 等之间切换（网关做路由与回退）。\n- “安全与合规加值”模式：把内容安全、PII 处理、审计日志、策略编排做成平台能力（可收费或做内部成本中心）。"
+        },
+        {
+          "heading": "对云服务/云游戏/AI 创业的启发",
+          "body": "- 云游戏天然是高并发、强时延敏感业务；一旦叠加 AI（NPC 对话、AIGC 资产生成、客服/运营自动化），你会同时面对“实时交互流式输出 + 多模型成本控制 + 多租户隔离”。AI Gateway 的思路能把这三件事从业务里抽出来。\n- 创业机会：面向特定行业（游戏/泛娱乐/教育）做“模型路由+成本治理+安全合规”的垂直化网关/控制台，往往比“再做一个 Agent 框架”更容易进入企业预算（因为直接降低运维复杂度与成本不可控）。"
+        },
+        {
+          "heading": "术语卡片（5 个）",
+          "body": "- LLM Gateway：对多家模型提供商的统一入口层，做路由/回退/统一 API。\n- Hostname-based routing：按域名决定路由规则，常用于多租户隔离与“不同客户不同模型集”。\n- Protocol translation：协议翻译，例如把 Anthropic Messages 形态转换为 AWS Bedrock Converse（见 v0.7.0 发布说明）。\n- Quota-aware rate limiting：配额感知限流，把“预算/配额”变成硬性流量控制（见 v0.7.0 发布说明）。\n- MCP（Model Context Protocol）：Agent 工具调用协议；当工具流量进入网关后，鉴权与可观测能做成统一能力（见官网描述）。"
+        },
+        {
+          "heading": "今日行动建议（10-20 分钟）",
+          "body": "1) 画一张你们业务的“LLM 调用链路图”：客户端/服务端→(网关?)→模型提供商→日志/成本。\n2) 给每个调用链路标注 4 个指标：延迟、token 成本、失败/重试策略、权限边界。\n3) 思考：哪些必须由平台统一做（鉴权/配额/观测/回退），哪些留给业务做（prompt、业务逻辑、评测）。"
+        },
+        {
+          "heading": "延伸阅读",
+          "body": "- Envoy AI Gateway 官网（定位、MCP、能力概览）：https://aigateway.envoyproxy.io/\n- Envoy AI Gateway v0.7.0 Release Notes（多租户路由、协议翻译、配额限流等）：https://aigateway.envoyproxy.io/release-notes/"
+        }
+      ]
+    },
+    {
+      "slug": "day-04-envoy-ai-gateway-v0-7-0",
+      "day_label": "Day 4",
+      "date": "2026-06-17",
+      "time": "22:09",
+      "title": "AI Gateway v0.7.0（以 Envoy AI Gateway 为例）：用 hostname 路由 + 配额 + 授权，把多模型与工具流量做成平台能力",
+      "tags": ["AI Gateway", "Envoy AI Gateway", "v0.7.0", "hostname 路由", "QuotaPolicy", "SSE"],
+      "sources": [
+        {"label": "Envoy AI Gateway 官网", "url": "https://aigateway.envoyproxy.io/"},
+        {"label": "Envoy AI Gateway Release Notes", "url": "https://aigateway.envoyproxy.io/release-notes/"}
+      ],
+      "notice": "2026-06-17 当天 18:00 与 22:00 两篇均围绕 Envoy AI Gateway，属于选题重复；后续推送规则已调整为同日不重复同一项目。本篇为当日第 2 篇，侧重 v0.7.0 版本动态。",
+      "sections": [
+        {
+          "heading": "标题",
+          "body": "AI Gateway v0.7.0（以 Envoy AI Gateway 为例）：用 hostname 路由 + 配额 + 授权，把多模型与工具流量做成平台能力"
+        },
+        {
+          "heading": "为什么今天要懂它",
+          "body": "当团队开始同时用 OpenAI / Claude / Gemini / Bedrock / Azure OpenAI，并且还要让“Agent 调工具（MCP）”进入生产环境时，最容易失控的不是模型能力，而是：入口不统一、鉴权不一致、配额难管、日志难查、流式响应（SSE）出问题难定位。AI Gateway 的价值，是把这些“生产系统问题”变成可复用的网关能力。"
+        },
+        {
+          "heading": "一句话解释",
+          "body": "AI Gateway = 面向“模型与工具调用”的 API Gateway：统一协议转换、路由、鉴权/授权、配额/限流、观测与审计。([Envoy AI Gateway](https://aigateway.envoyproxy.io/))"
+        },
+        {
+          "heading": "核心概念（用售前/产品语言）",
+          "body": "1) 统一入口与“多模型抽象层”：上游业务统一打到一个网关，网关负责把请求翻译成各家模型/平台的调用方式，并返回统一格式。([Envoy AI Gateway](https://aigateway.envoyproxy.io/))\n2) 路由（Routing）：按 hostname/路径/规则把不同租户或不同应用流量分发到不同模型集合。([Envoy AI Gateway Release Notes](https://aigateway.envoyproxy.io/release-notes/))\n3) 安全与治理：不仅是 API Key 鉴权，还包含“谁能看到哪些工具/模型”“哪些请求体需要脱敏”等。([Envoy AI Gateway Release Notes](https://aigateway.envoyproxy.io/release-notes/))\n4) 成本控制：配额（Quota）+ 限流（Rate limit）是最直接的推理成本闸门。([Envoy AI Gateway Release Notes](https://aigateway.envoyproxy.io/release-notes/))\n5) 可观测性：对流式输出、失败重试、供应商错误码、延迟等做统一监控，避免每个应用各自接一套。([Envoy AI Gateway Release Notes](https://aigateway.envoyproxy.io/release-notes/))"
+        },
+        {
+          "heading": "今天的产品动态：Envoy AI Gateway v0.7.0 你该关注什么（2026-06-04）",
+          "body": "- Hostname-based routing：在 AIGatewayRoute 里增加按 hostname 路由能力，便于多租户/多业务线共用一个网关但暴露不同模型集合（适合“同一套平台服务多个项目/客户”的场景）。([Envoy AI Gateway Release Notes](https://aigateway.envoyproxy.io/release-notes/))\n- QuotaPolicy 注入后端限流过滤器：开始把“配额感知的限流”做成网关能力，为“按客户/按应用/按环境控制推理预算”铺路。([Envoy AI Gateway Release Notes](https://aigateway.envoyproxy.io/release-notes/))\n- MCP tools/list 响应遵循授权规则：工具列表不再是“谁连上就全看到”，而是可控的授权输出，更接近企业落地要求。([Envoy AI Gateway Release Notes](https://aigateway.envoyproxy.io/release-notes/))\n- 生态适配扩展：新增 Anthropic Messages→Bedrock Converse 翻译、Azure OpenAI Responses API 支持，以及 OpenAI 音频转写/翻译端点等，说明网关正在向“跨供应商协议兼容层”演进。([Envoy AI Gateway Release Notes](https://aigateway.envoyproxy.io/release-notes/))"
+        },
+        {
+          "heading": "典型服务模式/商业模式（你在行业里会看到的几种卖法）",
+          "body": "1) “企业AI平台”的必选组件：网关+身份权限+审计+计费，卖给大客户做内部模型服务目录。\n2) MSP/集成商交付：把网关作为标准件，快速接入不同模型供应商，缩短 PoC 到生产的路径。\n3) SaaS/计费中台：按 token、按模型、按租户计费；网关天然是计量点。"
+        },
+        {
+          "heading": "对云服务/云游戏/AI创业的启发",
+          "body": "- 对云游戏：你可能会把“剧情生成/语音转写/客服助手/反作弊分析”等 AI 能力逐步产品化。AI Gateway 让你可以在不改业务代码的情况下切换供应商、控制成本、做租户隔离，并把推理调用纳入统一观测体系。\n- 对售前：把“可控、可审计、可计费”作为卖点，比单纯强调模型效果更容易打动企业客户。\n- 对创业：如果你做的是 Agent 平台或垂直行业 AI 应用，早期就用网关统一供应商，有助于避免被某一家 API 锁死。"
+        },
+        {
+          "heading": "术语卡片（3-5 个）",
+          "body": "- AI Gateway：面向模型/工具调用的网关层，提供统一入口、治理与观测。([Envoy AI Gateway](https://aigateway.envoyproxy.io/))\n- Hostname-based routing：按域名区分租户/业务线的路由方式，适合多租户共享网关。([Envoy AI Gateway Release Notes](https://aigateway.envoyproxy.io/release-notes/))\n- QuotaPolicy：按租户/应用定义配额策略，通常与限流/计费绑定。([Envoy AI Gateway Release Notes](https://aigateway.envoyproxy.io/release-notes/))\n- MCP tools/list：Agent 在调用工具前常见的“列出可用工具”接口；是否受授权控制决定了企业可用性。([Envoy AI Gateway Release Notes](https://aigateway.envoyproxy.io/release-notes/))\n- SSE（Server-Sent Events）：流式输出常用机制；网关要能正确转发/观测 SSE 才能支撑对话式应用。([Envoy AI Gateway Release Notes](https://aigateway.envoyproxy.io/release-notes/))"
+        },
+        {
+          "heading": "今日行动建议（15-30 分钟）",
+          "body": "1) 画一张你们现有“AI调用链路图”：客户端/业务服务→(是否有网关)→模型供应商，并标注鉴权、配额、日志在哪一层做。\n2) 设想一个“最先失控”的场景：某个 PoC 变成生产、token 暴涨、账单爆表。写下你会在哪一层加闸（网关/业务/供应商侧）。\n3) 如果你们已有 API Gateway（如 Envoy/Nginx/Kong），思考：AI 调用是否也应该纳入统一入口，还是单独一套？"
+        },
+        {
+          "heading": "延伸阅读",
+          "body": "- Envoy AI Gateway：项目主页与文档入口 ([Envoy AI Gateway](https://aigateway.envoyproxy.io/))\n- v0.7.0 版本更新点（含 hostname 路由、QuotaPolicy、MCP 授权等）([Envoy AI Gateway Release Notes](https://aigateway.envoyproxy.io/release-notes/))"
+        }
+      ]
+    },
+    {
+      "slug": "day-05-token-cost-governance-three-levers",
+      "day_label": "Day 5（上午）",
+      "date": "2026-06-18",
+      "time": "09:04",
+      "title": "Token成本治理三板斧：Prompt Caching + Batch API + 模型路由（从“省钱”走向“可运营”）",
+      "tags": ["Token 成本", "Prompt Caching", "Batch API", "模型路由", "FinOps", "成本治理"],
+      "sources": [
+        {"label": "OpenAI Prompt Caching 文档", "url": "https://developers.openai.com/api/docs/guides/prompt-caching"},
+        {"label": "OpenAI Batch API 文档", "url": "https://platform.openai.com/docs/guides/batch/batch-api"},
+        {"label": "OpenAI API Pricing", "url": "https://openai.com/api/pricing/"}
+      ],
+      "notice": "",
+      "sections": [
+        {
+          "heading": "为什么今天要懂它",
+          "body": "你做售前/PM时，客户最常问的不再是“能不能用大模型”，而是“怎么把 token 费、GPU 费做成可控的单元经济”。能把“成本优化”讲成一套平台能力（指标-策略-落地链路），比单点调参更容易打动采购与交付团队。"
+        },
+        {
+          "heading": "一句话解释",
+          "body": "把大模型调用当成“可计量的生产流水线”，用缓存降低重复输入、用批处理吃掉非实时任务的折扣、用路由把不同任务分配给性价比最合适的模型，并用指标闭环持续治理。"
+        },
+        {
+          "heading": "核心概念（从平台视角）",
+          "body": "1) Prompt Caching（提示词缓存）\n- 触发门槛：OpenAI 文档说明缓存会自动启用，适用于提示词达到 1024 tokens 及以上的请求，命中依赖“精确前缀匹配”（[OpenAI Prompt Caching 文档](https://developers.openai.com/api/docs/guides/prompt-caching)）。\n- 价值表述：同一文档给出可量化收益：延迟最高降低 80%，输入 token 成本最高降低 90%（[OpenAI Prompt Caching 文档](https://developers.openai.com/api/docs/guides/prompt-caching)）。\n- 平台可观测：响应里有 `usage.prompt_tokens_details.cached_tokens` 字段，可用来做命中率、缓存 token 占比、延迟对比等运营指标（[OpenAI Prompt Caching 文档](https://developers.openai.com/api/docs/guides/prompt-caching)）。\n\n2) Batch API（批处理异步调用）\n- 解决的问题：用 `.jsonl` 把一组请求提交，异步执行，并在 24h 内返回结果，适合“不需要即时响应”的任务（[OpenAI Batch API 文档](https://platform.openai.com/docs/guides/batch/batch-api)）。\n- 规模与约束：单个 batch 最多 50,000 requests、输入文件最大 200MB；输出与错误分别落到 `output_file_id` / `error_file_id`，结果顺序可能与输入不一致，需要用 `custom_id` 对齐（[OpenAI Batch API 文档](https://platform.openai.com/docs/guides/batch/batch-api)）。\n- 成本：文档明确写到相对同步 API 有 50% 成本折扣（[OpenAI Batch API 文档](https://platform.openai.com/docs/guides/batch/batch-api)；[OpenAI API Pricing](https://openai.com/api/pricing/)）。\n\n3) 模型路由（Model Routing / Rightsizing）\n- 目标：把“同一个模型解决所有问题”改成“按任务难度/风险分层”。例如：摘要/分类走便宜模型；关键决策/长上下文/高准确性走更强模型。\n- 与前两者的关系：缓存解决“重复前缀”成本，批处理解决“非实时”成本，路由解决“模型选型”成本；三者叠加，才有机会把 GenAI 的单位成本打下来并稳定住。"
+        },
+        {
+          "heading": "产业链/玩家/产品动态（不重复近期主题）",
+          "body": "- 你之前学过 AI Gateway / MCP，是“控制面与接入层”。今天这套三板斧更偏“成本运营面”：缓存与批处理属于供应商 API 层能力；路由与预算/配额/报表更适合落在聚合平台/网关侧做统一策略（但不要把某个具体网关当作唯一解）。"
+        },
+        {
+          "heading": "典型服务模式/商业模式（售前可用）",
+          "body": "- “成本治理包”作为增值：\n  A) 统一接入 + 统一计量（按项目/租户/应用打标）\n  B) 策略中心（缓存策略、批处理队列、路由策略、预算与告警）\n  C) 运营报表（按模型/场景/团队 showback/chargeback）\n- 计费抓手：把客户关注点从“单次调用价格”引导到“有效 token 占比、缓存命中率、批处理占比、任务分层命中率”。"
+        },
+        {
+          "heading": "对云服务/云游戏/AI创业的启发",
+          "body": "- 云游戏场景里，实时链路（低延迟互动）与非实时链路（内容审核、脚本生成、用户画像、回放摘要）天然分离：\n  - 非实时任务优先批处理吃折扣；\n  - 多场景共用的系统提示词/工具定义做前缀缓存；\n  - 按风险分层路由：内容合规/付费相关用更强模型并加审计。\n- 创业机会：做“AI 用量与成本运营层”（FinOps for GenAI）往往比再做一个应用更容易卖给企业：它和采购、财务、SRE/平台团队的 KPI 天然一致。"
+        },
+        {
+          "heading": "术语卡片（5个）",
+          "body": "- cached_tokens：提示词中命中缓存的输入 token 数量，用来估算节省与命中率（[OpenAI Prompt Caching 文档](https://developers.openai.com/api/docs/guides/prompt-caching)）。\n- prompt_cache_retention：缓存保留策略参数；文档提到 `in_memory` 与最长 `24h` 的 extended 方案，并与组织的 ZDR 设置有关默认值（[OpenAI Prompt Caching 文档](https://developers.openai.com/api/docs/guides/prompt-caching)）。\n- Batch JSONL：批处理输入文件格式；每行一个请求体，必须有 `custom_id`（[OpenAI Batch API 文档](https://platform.openai.com/docs/guides/batch/batch-api)）。\n- error_file_id：批处理失败请求输出位置，用于统一重试与失败分析（[OpenAI Batch API 文档](https://platform.openai.com/docs/guides/batch/batch-api)）。\n- Rightsizing（模型规格匹配）：把不同任务分配给“足够好且更便宜”的模型，减少过度使用旗舰模型的浪费（概念）。"
+        },
+        {
+          "heading": "今日行动建议（立刻可做）",
+          "body": "1) 盘点你当前/设想的 3 类调用：实时/准实时/离线；把“离线”标记为 Batch 候选。\n2) 选一个高频链路，把系统提示词/工具定义固定化放在最前面，设计成可复用前缀，开始记录 `cached_tokens` 与命中率（[OpenAI Prompt Caching 文档](https://developers.openai.com/api/docs/guides/prompt-caching)）。\n3) 画一张“路由矩阵”：任务类型 → 模型层级 → SLA → 是否允许 Batch → 是否必须审计。"
+        },
+        {
+          "heading": "延伸阅读",
+          "body": "- OpenAI Prompt Caching 指南：https://developers.openai.com/api/docs/guides/prompt-caching\n- OpenAI Batch API 指南：https://platform.openai.com/docs/guides/batch/batch-api\n- OpenAI API Pricing（含 Batch 50%）：https://openai.com/api/pricing/"
+        }
+      ]
+    },
+    {
+      "slug": "day-05-rate-limits-usage-cost-api-anthropic",
+      "day_label": "Day 5（傍晚）",
+      "date": "2026-06-18",
+      "time": "18:03",
+      "title": "把限流与成本治理做成平台能力：Rate limits + Usage/Cost API（以 Anthropic 为例）",
+      "tags": ["Rate limits", "Spend limits", "Token bucket", "Usage Report", "Cost Report", "Anthropic"],
+      "sources": [
+        {"label": "Anthropic：Rate limits", "url": "https://docs.anthropic.com/en/api/rate-limits"},
+        {"label": "Anthropic：使用量和成本API", "url": "https://docs.anthropic.com/zh-CN/api/usage-cost-api"}
+      ],
+      "notice": "",
+      "sections": [
+        {
+          "heading": "为什么今天要懂它",
+          "body": "你做“统一模型接入/模型矩阵”的平台或售前方案时，客户最关心的不只是“能不能调到模型”，而是“高峰期会不会爆429、怎么给不同业务线分配额度、怎么做成本归因与对账”。把配额/限流/用量/成本做成产品能力，才能谈SLA与规模化交付。"
+        },
+        {
+          "heading": "一句话解释",
+          "body": "把“调用上限（限流+预算）”和“事后账本（用量+美元成本）”标准化、可观测、可分摊，才能把大模型API从“开发接口”升级成“企业级平台服务”。"
+        },
+        {
+          "heading": "核心概念（从官方口径出发）",
+          "body": "1) 两类限制：Spend limits（每月花费上限） vs Rate limits（单位时间请求上限）——Anthropic 明确区分两者，并说明二者都适用于 Standard/Priority tier（[Anthropic：Rate limits](https://docs.anthropic.com/en/api/rate-limits)）。\n2) 组织级 vs Workspace级：服务端强制在组织层生效，同时允许你按 Workspace 配“自定义花费/限流”，但“组织级总上限永远生效”（[Anthropic：Rate limits](https://docs.anthropic.com/en/api/rate-limits)）。\n3) 突发流量与短窗口：即使是 60 RPM，也可能按 1 RPS 这种更短窗口执行；突发会触发 429；用量骤增还可能触发“acceleration limits”，官方建议“逐步爬坡、保持稳定模式”（[Anthropic：Rate limits](https://docs.anthropic.com/en/api/rate-limits)）。\n4) Token bucket：Anthropic 指出使用 token bucket 做限流，容量会持续补充到上限，而不是固定窗口重置（[Anthropic：Rate limits](https://docs.anthropic.com/en/api/rate-limits)）。\n5) 限制维度（网关最关心）：Messages API 的速率限制按 RPM、ITPM（input tokens/min）、OTPM（output tokens/min）计量，并且“不同模型分别计限”，可并行用到各自上限（[Anthropic：Rate limits](https://docs.anthropic.com/en/api/rate-limits)）。"
+        },
+        {
+          "heading": "产业链/玩家/产品动态（站在“模型聚合平台”视角）",
+          "body": "- 模型厂商越来越把“限流+分层服务”产品化：tier、workspace隔离、响应头暴露剩余额度、429 + retry-after，都是平台可对接的标准信号（[Anthropic：Rate limits](https://docs.anthropic.com/en/api/rate-limits)）。\n- 仅有“调用日志”不够，必须有“可编程的组织级用量与成本接口”：Anthropic 提供 Usage Report（按模型/工作区/服务层等拆分的令牌消耗）和 Cost Report（按服务级别的美元成本分解）（[Anthropic：使用量和成本API](https://docs.anthropic.com/zh-CN/api/usage-cost-api)）。"
+        },
+        {
+          "heading": "典型服务/商业模式（你可以怎么对客户讲清楚）",
+          "body": "- “配额=治理边界”：组织级上限是合同/预算边界；Workspace级上限是部门/项目边界。你卖的是“可控可交付”，不是“无限API”（[Anthropic：Rate limits](https://docs.anthropic.com/en/api/rate-limits)）。\n- “成本=账本接口”：把 Usage Report 当作调用事实表，把 Cost Report 当作美元账本，用于预算、核算、分摊、对账（[Anthropic：使用量和成本API](https://docs.anthropic.com/zh-CN/api/usage-cost-api)）。"
+        },
+        {
+          "heading": "对云服务/云游戏/AI创业的启发",
+          "body": "- 云游戏最怕峰值突发：把“逐步爬坡 + 平滑突发 + 重试队列”写进你的AI网关/中台交付方案，客户会把它当SLA的一部分（429/acceleration limits 相关说明）（[Anthropic：Rate limits](https://docs.anthropic.com/en/api/rate-limits)）。\n- 创业做“模型聚合/API平台”时，差异化往往不在模型本身，而在：多维限流（RPM/ITPM/OTPM）、分工作区配额、成本归因、以及可视化+API报表（Usage/Cost API）（[Anthropic：Rate limits](https://docs.anthropic.com/en/api/rate-limits)；[Anthropic：使用量和成本API](https://docs.anthropic.com/zh-CN/api/usage-cost-api)）。"
+        },
+        {
+          "heading": "术语卡片（3-5个）",
+          "body": "- Spend limits：每月花费上限（预算闸门）（[Anthropic：Rate limits](https://docs.anthropic.com/en/api/rate-limits)）\n- Rate limits：单位时间调用上限（容量闸门）（[Anthropic：Rate limits](https://docs.anthropic.com/en/api/rate-limits)）\n- Token bucket：持续补充容量的限流算法，适合解释“不是整点清零”（[Anthropic：Rate limits](https://docs.anthropic.com/en/api/rate-limits)）\n- Acceleration limits：用量突然飙升触发的额外限制，需要流量爬坡（[Anthropic：Rate limits](https://docs.anthropic.com/en/api/rate-limits)）\n- Usage Report / Cost Report：组织级用量与成本报表API（[Anthropic：使用量和成本API](https://docs.anthropic.com/zh-CN/api/usage-cost-api)）"
+        },
+        {
+          "heading": "今日行动建议（30-60分钟）",
+          "body": "1) 画一张你们“统一模型接入”平台的配额层级图：Organization → Workspace/项目 → API Key/应用；每层写清“谁审批/谁背预算/谁看报表”（参考组织级+workspace级设计）（[Anthropic：Rate limits](https://docs.anthropic.com/en/api/rate-limits)）。\n2) 把限流做成“产品化开关”：至少支持 RPM/ITPM/OTPM 三个维度的阈值与告警；并定义 429 的重试策略（指数退避/队列/熔断）（参考 429 + retry-after 与限制维度）（[Anthropic：Rate limits](https://docs.anthropic.com/en/api/rate-limits)）。\n3) 设计一张“用量×成本”对账表：按工作区/项目分摊，token与美元并列；数据源用 Usage Report + Cost Report（[Anthropic：使用量和成本API](https://docs.anthropic.com/zh-CN/api/usage-cost-api)）。"
+        },
+        {
+          "heading": "延伸阅读",
+          "body": "- Anthropic：Rate limits（含Spend limits、workspace限制、token bucket、429/acceleration）https://docs.anthropic.com/en/api/rate-limits\n- Anthropic：使用量和成本API（Usage Report / Cost Report）https://docs.anthropic.com/zh-CN/api/usage-cost-api"
+        }
+      ]
+    },
+    {
+      "slug": "day-05-spend-limit-cloudflare-ai-gateway",
+      "day_label": "Day 5（晚间）",
+      "date": "2026-06-18",
+      "time": "22:12",
+      "title": "“Spend Limit”不是限流：把成本预算做成 AI Gateway 的第一公民（以 Cloudflare AI Gateway 为例）",
+      "tags": ["Spend limit", "AI Gateway", "Cloudflare", "预算", "成本治理", "Metadata"],
+      "sources": [
+        {"label": "Cloudflare AI Gateway Changelog", "url": "https://developers.cloudflare.com/changelog/product/ai-gateway/"}
+      ],
+      "notice": "",
+      "sections": [
+        {
+          "heading": "标题",
+          "body": "“Spend Limit”不是限流：把成本预算做成 AI Gateway 的第一公民（以 Cloudflare AI Gateway 为例）"
+        },
+        {
+          "heading": "为什么今天要懂它",
+          "body": "很多团队做了多模型接入/模型路由，却仍然在“月底看账单”——问题不在模型，而在缺少“按美元/按租户/按场景”的实时预算闸门。AI Gateway 一旦能直接按成本封顶，你的售前 SLA、折扣策略、试用政策和交付边界就能被“系统执行”，而不是靠人盯。"
+        },
+        {
+          "heading": "一句话解释",
+          "body": "**Spend limits = 在网关层按“真实 token 成本”设预算，超过就自动阻断请求；它解决的是“钱”的问题，不是“请求数”的问题**（[Cloudflare AI Gateway Changelog](https://developers.cloudflare.com/changelog/product/ai-gateway/)）。"
+        },
+        {
+          "heading": "核心概念（入门但够用）",
+          "body": "1) **Rate limit vs Spend limit**\n- Rate limit：限制请求频率/数量，控制“流量”。\n- Spend limit：限制累计花费（美元预算），控制“成本”。Cloudflare 明确强调 spend limits 与 rate limiting 的差异：前者基于 token 使用和模型定价来计算成本并阻断（[Cloudflare AI Gateway Changelog](https://developers.cloudflare.com/changelog/product/ai-gateway/)）。\n\n2) **预算维度（Budget scope）**\nCloudflare 提到可按 model / provider / 自定义 metadata 维度设预算，并给了典型例子：\n- 每个用户 **$200/天**\n- 全部网关总成本 **$10,000/天**\n- 某个模型对每个用户 **$50/天**\n且支持固定窗口或滑动窗口（fixed/sliding window）（[Cloudflare AI Gateway Changelog](https://developers.cloudflare.com/changelog/product/ai-gateway/)）。\n\n3) **“日志可控”是合规与成本治理的基础**\nCloudflare 提供 `cf-aig-collect-log-payload` header：默认 true 记录请求/响应 payload；设为 false 则不存 payload，但仍保留 **token counts、model、provider、status code、cost、duration** 等元数据（[Cloudflare AI Gateway Changelog](https://developers.cloudflare.com/changelog/product/ai-gateway/)）。\n这对你做“成本归因 + 隐私合规（不落敏感内容）”很关键。"
+        },
+        {
+          "heading": "产业链/玩家/产品动态",
+          "body": "- “AI Gateway”正在从“多模型统一接入”进化为“成本/安全/可观测”统一控制面。Cloudflare 在 changelog 中把 logging/caching/rate limiting/guardrails 描述为网关能力，并提供通用 API 端点（例如 `/ai/run`）以及兼容 OpenAI/Anthropic 风格的端点（[Cloudflare AI Gateway Changelog](https://developers.cloudflare.com/changelog/product/ai-gateway/)）。\n- 这意味着：未来给客户卖的不是“你能连多少模型”，而是“你能否把调用变成可审计、可预算、可限额、可回溯的企业能力”。"
+        },
+        {
+          "heading": "典型服务模式/商业模式（售前可直接拿去讲）",
+          "body": "1) **按租户预算的 API 平台**：给每个客户/部门/项目一个“美元预算 + token 配额”，超了自动降级/阻断；把“超额计费/自动停机/自动降档”写进合同与 SLA。\n2) **试用与 PoC 的可控交付**：PoC 期间给“按天预算封顶”，避免交付被“无限试用”拖死；预算耗尽=试用到期。\n3) **折扣与成本监控联动**：预算与路由策略联动，预算紧张时自动切到更便宜模型/更激进缓存策略（关键是网关提供成本闸门）。"
+        },
+        {
+          "heading": "对云服务/云游戏/AI创业的启发",
+          "body": "- 云游戏天然是“高并发+强成本敏感”。把 LLM 调用也当成“可计费资源”，才能像带宽/转码/GPU 一样做：预算、配额、降级、分层套餐。\n- 创业角度：别只做“模型聚合”，要做“面向采购方的成本与合规控制面”。**Spend limits + 可控日志（payload 可关）**是一组更容易被企业买单的“治理型卖点”。"
+        },
+        {
+          "heading": "术语卡片",
+          "body": "- **Spend limit**：按美元/成本预算封顶的网关策略（[Cloudflare AI Gateway Changelog](https://developers.cloudflare.com/changelog/product/ai-gateway/)）。\n- **Fixed window / Sliding window**：预算计算窗口；滑动窗口更平滑，固定窗口更易解释。\n- **Metadata tagging**：给每次调用打 tenant/user/feature/customer 标签，用于预算与归因。\n- **BYOK（Bring Your Own Key）**：客户自带上游模型 Key；Cloudflare 提到 spend limits 可用于 Unified Billing 与 BYOK（[Cloudflare AI Gateway Changelog](https://developers.cloudflare.com/changelog/product/ai-gateway/)）。\n- **Log payload vs metadata**：是否存储请求/响应正文（payload）；即使不存 payload 也可保留 token/cost/duration 等元数据（[Cloudflare AI Gateway Changelog](https://developers.cloudflare.com/changelog/product/ai-gateway/)）。"
+        },
+        {
+          "heading": "今日行动建议（10-20 分钟）",
+          "body": "1) 画你们“LLM 调用链路图”：客户端/后端/网关/模型供应商，并标出哪里能统一打 metadata。\n2) 定义 3 个预算维度：按“客户/项目/功能”各一个，并设 PoC 阶段每日预算上限。\n3) 写一段售前话术：\n- “我们不是只做限流，我们能按成本预算封顶，避免月底爆账；并且可选择不落 prompt/response 正文，只留 token 与成本指标，兼顾合规。”"
+        },
+        {
+          "heading": "延伸阅读",
+          "body": "- Cloudflare AI Gateway Changelog（Spend limits、预算维度、日志 payload 开关等）：https://developers.cloudflare.com/changelog/product/ai-gateway/"
+        }
+      ]
+    }
+  ]
+}

@@ -16,8 +16,27 @@
 ```text
 .
 ├── README.md
+├── data/
+│   └── daily_pushes.json          # 每日推送的结构化数据
+├── scripts/
+│   └── init_daily_push_archive.py # 归档生成/重建脚本
+├── daily-pushes/                  # 每日推送归档（自动生成）
+│   ├── README.md                  # 归档索引
+│   └── day-*.md                   # 每条推送的独立页面
 └── weekly-reports/
     └── week-01-ai-industry-foundations.md
+```
+
+## 每日学习推送归档
+
+每天的应用内 AI 学习推送会被归档为 `daily-pushes/` 下的独立 Markdown 页面，并附带一个带链接的索引页：
+
+- 归档索引：[daily-pushes/README.md](daily-pushes/README.md)
+
+归档由 `data/daily_pushes.json` 结构化数据生成，可随时重建（幂等、可重复运行）：
+
+```bash
+python scripts/init_daily_push_archive.py
 ```
 
 ## 周报索引
