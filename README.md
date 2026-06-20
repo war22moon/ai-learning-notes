@@ -16,28 +16,21 @@
 ```text
 .
 ├── README.md
-├── data/
-│   └── daily_pushes.json          # 每日推送的结构化数据
-├── scripts/
-│   └── init_daily_push_archive.py # 归档生成/重建脚本
-├── daily-pushes/                  # 每日推送归档（自动生成）
-│   ├── README.md                  # 归档索引
-│   └── day-*.md                   # 每条推送的独立页面
 └── weekly-reports/
     └── week-01-ai-industry-foundations.md
 ```
 
-## 每日学习推送归档
+## 更新节奏与维护原则
 
-每天的应用内 AI 学习推送会被归档为 `daily-pushes/` 下的独立 Markdown 页面，并附带一个带链接的索引页：
+这个仓库刻意保持“高信噪比、结构化、可复盘”，不是一个原始信息流。因此更新节奏遵循以下原则：
 
-- 归档索引：[daily-pushes/README.md](daily-pushes/README.md)
-
-归档由 `data/daily_pushes.json` 结构化数据生成，可随时重建（幂等、可重复运行）：
-
-```bash
-python scripts/init_daily_push_archive.py
-```
+- **每日 Perplexity / 应用内推送**只用于学习输入和短期捕捉，属于个人学习过程，不直接进入仓库。
+- **GitHub 不会每天自动同步**，也不再维护每日推送归档。
+- **GitHub 只在以下情况更新**：
+  - 完成每周的精选/筛选式总结后；或
+  - 用户主动要求阶段性总结时。
+- **优先产出**放在 `weekly-reports/`，后续可选地补充 `concept-cards/`（概念卡片）或精选主题指南。
+- 目标是让仓库始终保持**高信号、结构化、可审阅**，而不是变成未经筛选的原始推送堆叠。
 
 ## 周报索引
 
